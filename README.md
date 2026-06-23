@@ -1,6 +1,18 @@
-# Welcome to GitHub Desktop!
+# Embedded System Design Assignments
 
-This is your README. READMEs are where you can communicate what your project is and how to use it.
+Student: Leruca
 
-Write your name on line 6, save it, and then head back to GitHub Desktop.
-Leruca
+This repository contains the Arduino/ESP32 work for the embedded system design assignments.
+
+## Contents
+
+- `lab02`: basic GPIO LED blink
+- `lab03`: PWM breathing LED
+- `ex02`: 1 Hz LED blink implemented with `millis()`
+- `ex03`: SOS LED signal implemented with `millis()`
+
+## Board
+
+- ESP32 Dev Module
+- Built-in LED on GPIO 2
+- Serial monitor baud rate: `115200`
