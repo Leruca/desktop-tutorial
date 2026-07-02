@@ -1,5 +1,5 @@
-// Assignment 07: Web slider dimmer.
-// ESP32 creates a Wi-Fi AP. Open http://192.168.4.1 and move the slider.
+// Assignment 07: Web text-input dimmer.
+// ESP32 creates a Wi-Fi AP. Open http://192.168.4.1 and enter a brightness value.
 
 #include <WebServer.h>
 #include <WiFi.h>
@@ -66,17 +66,48 @@ const char indexHtml[] PROGMEM = R"rawliteral(
       box-shadow:0 0 24px rgba(255,122,168,.62);
       margin-bottom:28px;
     }
-    .slider-wrap{
+    .input-wrap{
       padding:22px 22px 26px;
       border-radius:18px;
       background:rgba(255,255,255,.55);
       box-shadow:0 12px 34px rgba(255,95,162,.18);
       backdrop-filter:blur(6px);
     }
-    input[type=range]{
-      width:100%;
-      accent-color:#ff5fa2;
+    .controls{
+      display:flex;
+      gap:12px;
+      justify-content:center;
+      flex-wrap:wrap;
+    }
+    input[type=number]{
+      width:160px;
+      box-sizing:border-box;
+      border:2px solid #ff9ac1;
+      border-radius:10px;
+      padding:13px 14px;
+      font-size:20px;
+      text-align:center;
+      color:#333;
+      outline:none;
+      background:rgba(255,255,255,.92);
+      box-shadow:0 6px 16px rgba(255,95,162,.14);
+    }
+    input[type=number]:focus{
+      border-color:#ff5fa2;
+      box-shadow:0 0 0 4px rgba(255,95,162,.18);
+    }
+    button{
+      border:none;
+      border-radius:10px;
+      padding:13px 22px;
+      font-size:18px;
+      color:#fff;
       cursor:pointer;
+      background:#ff7aa8;
+      box-shadow:0 6px 16px rgba(255,95,162,.25);
+    }
+    button:active{
+      transform:scale(.96);
     }
     .hint{
       margin-top:16px;
@@ -112,11 +143,14 @@ const char indexHtml[] PROGMEM = R"rawliteral(
 </head>
 <body>
   <main class="content">
-    <h1>第七部分：可爱无极调光器</h1>
-    <div class="subtitle">拖动滑条，板载 LED 会实时改变亮度</div>
+    <h1>调光器</h1>
+    <div class="subtitle">输入 0 到 255，板载 LED 会改变亮度</div>
     <div class="value" id="value">0</div>
-    <div class="slider-wrap">
-      <input id="slider" type="range" min="0" max="255" value="0">
+    <div class="input-wrap">
+      <div class="controls">
+        <input id="brightness" type="number" min="0" max="255" value="0">
+        <button id="submit" type="button">设置亮度</button>
+      </div>
       <div class="hint">亮度范围：0 - 255</div>
     </div>
   </main>
@@ -131,11 +165,23 @@ const char indexHtml[] PROGMEM = R"rawliteral(
   <div class="danmaku d9">(＾▽＾)</div>
   <div class="danmaku d10">(￣▽￣)ノ</div>
   <script>
-    const slider = document.getElementById('slider');
+    const input = document.getElementById('brightness');
+    const submit = document.getElementById('submit');
     const value = document.getElementById('value');
-    slider.addEventListener('input', () => {
-      value.textContent = slider.value;
-      fetch('/set?value=' + slider.value).catch(() => {});
+    function clampBrightness(raw) {
+      const parsed = Number.parseInt(raw, 10);
+      if (Number.isNaN(parsed)) return 0;
+      return Math.min(255, Math.max(0, parsed));
+    }
+    function sendBrightness() {
+      const brightness = clampBrightness(input.value);
+      input.value = brightness;
+      value.textContent = brightness;
+      fetch('/set?value=' + brightness).catch(() => {});
+    }
+    submit.addEventListener('click', sendBrightness);
+    input.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') sendBrightness();
     });
   </script>
 </body>
